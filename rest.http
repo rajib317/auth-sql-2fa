@@ -1,0 +1,61 @@
+GET http://localhost:3000/
+
+GET http://localhost:3000/packing
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDQ5ODM4MTIsImV4cCI6MTcwNDk4NzQxMiwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.dRdq6QmoqsOQpRCN6hvXex1eNRpTmEzmgxx9kW19_no
+
+#### Add Route
+POST http://localhost:3000/packing/add
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDQ3MTU2NTIsImV4cCI6MTcwNDcxOTI1MiwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.mQR5ZJq3TzKXvD-0ZGSUKTUwctfSoXoRsxJ-Vr52API
+Content-Type: application/json
+
+{
+    "title": "Something Important",
+    "quantity": 2,
+    "packed": false
+}
+
+#### Edit packing
+PUT http://localhost:3000/packing/update/659be09636436c43937024d0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDQ3MTU2NTIsImV4cCI6MTcwNDcxOTI1MiwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.mQR5ZJq3TzKXvD-0ZGSUKTUwctfSoXoRsxJ-Vr52API
+Content-Type: application/json
+
+{
+    "packed": true
+}
+#### Delete packing
+DELETE http://localhost:3000/packing/delete/659be03375ad111ea29815f1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDQ3MTU2NTIsImV4cCI6MTcwNDcxOTI1MiwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.mQR5ZJq3TzKXvD-0ZGSUKTUwctfSoXoRsxJ-Vr52API
+Content-Type: application/json
+
+
+####Login Route
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email":"rajib317@gmail.com",
+    "password": "1234" 
+}
+
+####Register Route
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "email":"rajib318@yahoo.co.in",
+    "password": "1234" 
+}
+
+####Refresh Token Route
+POST http://localhost:3000/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDU0MDI0NDksImV4cCI6MTczNjk2MDA0OSwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.59Tnvzk8vPubB5ov_WX3og3VmNsuNWQf-MFGejj9Hzs"
+}
+
+####Logout Route
+DELETE  http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{"refreshToken" :"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDQ1NTU0MDgsImV4cCI6MTczNjExMzAwOCwiYXVkIjoiNjU5NmRlZGM1NTUxODRjNTNmMzM1ODMyIiwiaXNzIjoibG9jYWxob3N0In0.vYMF6uyO93Ms6Ohts86FWDZn5PDvgcTdU4nCQIzZa90"}
