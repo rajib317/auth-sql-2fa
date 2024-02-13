@@ -42,8 +42,9 @@ POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
-    "email":"rajib318@yahoo.co.in",
-    "password": "1234" 
+    "email":"rajib313@yahoo.co.in",
+    "firstName":"Rajib",
+    "password": "12" 
 }
 
 ####Refresh Token Route

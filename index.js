@@ -41,4 +41,6 @@ app.use((err, req, res, next) => {
 // })();
 const port = process.env.PORT || 3000;
 
+sequelize.sync().catch((error) => console.log(error));
+
 app.listen(port, () => console.log(`running on ${port}`));

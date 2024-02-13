@@ -12,15 +12,21 @@ const User = sequelize.define(
       primaryKey: true,
     },
     // Model attributes are defined here
+    email: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     firstName: {
       type: DataTypes.STRING,
-      lowercase: true,
-      unique: true,
       allowNull: false,
     },
     lastName: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
   },
   {
