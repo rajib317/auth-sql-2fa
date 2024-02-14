@@ -5,6 +5,8 @@ const createError = require('http-errors');
 require('dotenv').config();
 const sequelize = require('./util/init_mysql');
 
+const session = require('express-session');
+
 const AuthRoute = require('./routes/Auth.Route');
 
 const app = express();
@@ -14,7 +16,13 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors());
 app.use('/auth', AuthRoute);
-
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 // 404
 app.use(async (req, res, next) => {
   next(createError.NotFound());

@@ -57,13 +57,13 @@ const User = sequelize.define(
 //   }
 // });
 
-// UserSchma.methods.isValidPassword = async function (password) {
-//   try {
-//     return await bcrypt.compare(password, this.password);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+User.prototype.isValidPassword = async function (password) {
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (error) {
+    next(error);
+  }
+};
 // const User = mongoose.model('user', UserSchma);
 
 module.exports = User;
