@@ -8,6 +8,8 @@ const sequelize = require('./util/init_mysql');
 const session = require('express-session');
 
 const AuthRoute = require('./routes/Auth.Route');
+const User = require('./models/User.Model');
+const Login = require('./models/Login.Model');
 
 const app = express();
 
@@ -48,7 +50,11 @@ app.use((err, req, res, next) => {
 //   }
 // })();
 const port = process.env.PORT || 3000;
+User.hasMany(Login);
 
 sequelize.sync().catch((error) => console.log(error));
+// sequelize
+//   .sync({ alter: true, force: true })
+//   .catch((error) => console.log(error));
 
 app.listen(port, () => console.log(`running on ${port}`));

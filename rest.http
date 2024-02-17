@@ -1,20 +1,17 @@
 ####Login Route
-POST http://localhost:3000/auth/login
+POST http://localhost:3001/auth/login
 Content-Type: application/json
 
 {
-    "email":"rajib317@gmail.com",
-    "password": "1234" 
+    "email":"idur@yahoo.co.in"
 }
 
 ####Register Route
-POST http://localhost:3000/auth/register
+POST http://localhost:3001/auth/register
 Content-Type: application/json
 
 {
-    "email":"rajib10@yahoo.co.in",
-    "firstName":"Rajib",
-    "password": "12" 
+    "email":"rajib317@gmail.com"
 }
 
 
@@ -23,11 +20,26 @@ POST http://localhost:3000/auth/refresh-token
 Content-Type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDc4OTM4NjEsImV4cCI6MTczOTQ1MTQ2MSwiYXVkIjoiMiIsImlzcyI6ImxvY2FsaG9zdCJ9.1xYVRJM8JZvoq8NIAVYT5nIP1bnfxf5zrG8OBsfht98"
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDc5MzI2MjUsImV4cCI6MTczOTQ5MDIyNSwiYXVkIjoiMiIsImlzcyI6ImxvY2FsaG9zdCJ9.jteYS7IY8LOCT8MdG_N6reP1aKX1mIUTisB2qSqOfqU"
 }
 
-####Logout Route
+####Verify Pin Route
+POST http://localhost:3000/auth/verify-pin
+Content-Type: application/json
+
+{
+    "email": "idur@yahoo.co.in",
+    "pin": "436315"
+}
+####Set Password
+POST http://localhost:3000/auth/set-password
+Content-Type: application/json
+
+{
+    "email": "idur@yahoo.co.in",
+    "password": "12345678"
+}
 
 ####Testing a protected Route
 GET http://localhost:3000/auth/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDc4OTM5MjAsImV4cCI6MTcwNzg5Mzk1MCwiYXVkIjoiMiIsImlzcyI6ImxvY2FsaG9zdCJ9.a_tnzsq1P9anrpqcWvLhF5LmPSjTe4V48BuFRvUlPwQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDc5MzI1NTMsImV4cCI6MTcwNzkzMzE1MywiYXVkIjoiMiIsImlzcyI6ImxvY2FsaG9zdCJ9.AtEmMOLVEqQEeUIfhvTktfZ_hcejhUDVtV-xrovJhUU

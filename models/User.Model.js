@@ -16,7 +16,6 @@ const User = sequelize.define('user', {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
 });
 
@@ -24,7 +23,7 @@ User.prototype.isValidPassword = async function (password) {
   try {
     return await bcrypt.compare(password, this.password);
   } catch (error) {
-    next(error);
+    throw error;
   }
 };
 // const User = mongoose.model('user', UserSchma);

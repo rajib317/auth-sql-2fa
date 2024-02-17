@@ -10,6 +10,9 @@ router.post('/login', authController.login);
 
 router.post('/refresh-token', authController.refreshToken);
 
+router.post('/verify-pin', authController.verifyPin);
+router.post('/set-password', authController.setPassword);
+
 //testing
 router.get('/user', verifyAcessToken, (req, res) => {
   res.send('Testting');
