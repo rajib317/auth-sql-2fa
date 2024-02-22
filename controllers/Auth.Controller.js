@@ -16,7 +16,7 @@ const {
   verifyRefreshToken,
 } = require('../util/jwt_helper');
 const generatePin = require('../util/generate_pin');
-const { default: axios } = require('axios');
+const axios = require('axios');
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -114,55 +114,46 @@ module.exports = {
       if (user.password === null)
         res.send({ loginLevel: 1, msg: 'Set new password' });
 
-      const lastLogin = await Login.findOne({
-        attributes: ['isPinVerified'],
+      const [lastLogin] = await Login.findAll({
+        limit: 1,
+        attributes: ['isPinVerified', 'pin'],
         where: { userId: user.id },
+        order: [['createdAt', 'DESC']],
       });
+
+      const emailPayload = {
+        to: user.email,
+        subject: 'PIN for TalkTo Login',
+        text: '',
+      };
+
       // If pin is not verified from the last time
       if (!lastLogin.dataValues.isPinVerified) {
-        await axios.post(process.env.EMAIL_SERVER_URI + '/email', {
-          to: user.email,
-          subject: 'PIN for TalkTo Login',
-          text: lastLogin.dataValues.pin,
+        emailPayload.text = `Your pin is ${lastLogin.dataValues.pin}`;
+      } else {
+        // If there is no last attempt create the pin
+        const pin = generatePin();
+        const pinSet = await Login.create({
+          userId: user.id,
+          isPinVerified: false,
+          pin,
         });
-
-        console.log('Pinned to email', {
-          to: user.email,
-          subject: 'PIN for TalkTo Login',
-          text: lastLogin.dataValues.pin,
-        });
-
-        res.send({
-          loginLevel: 2,
-          message: 'Please check your email.',
-        });
+        if (!pinSet) createError.InternalServerError();
+        emailPayload.text = `Your pin is ${pin}`;
       }
-
-      //   const isMatch = await user.isValidPassword(result.password);
-
-      // if (!isMatch)
-      //   throw createError.Unauthorized('Username/password not valid');
-
-      // user.create({ association: 'logins' });
-
-      const pinSet = await Login.create({
-        userId: user.id,
-        isPinVerified: false,
-        pin: generatePin(),
-      });
-      if (!pinSet) createError.InternalServerError();
-
+      await axios.post(process.env.EMAIL_SERVER_URI + '/email', emailPayload);
       res.send({ loginLevel: 2, message: 'Please check email' });
-
-      // const pin = generatePin();
-      // user.update({ pin });
-
-      // const accessToken = await signAccessToken(user.id);
-      // const refreshToken = await signRefreshToken(user.id);
-      // res.send({ accessToken, refreshToken });
     } catch (error) {
       if (error.isJoi)
         return next(createError.BadRequest('Invalid Username/Password'));
+      if (axios.isAxiosError) {
+        return next(
+          createError.InternalServerError(
+            'Cound not send email. ' + error.response?.data?.message ||
+              error.response
+          )
+        );
+      }
       next(error);
     }
   },
