@@ -16,6 +16,7 @@ const {
   verifyRefreshToken,
 } = require('../util/jwt_helper');
 const generatePin = require('../util/generate_pin');
+const { default: axios } = require('axios');
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -117,12 +118,25 @@ module.exports = {
         attributes: ['isPinVerified'],
         where: { userId: user.id },
       });
+      // If pin is not verified from the last time
+      if (!lastLogin.dataValues.isPinVerified) {
+        await axios.post(process.env.EMAIL_SERVER_URI + '/email', {
+          to: user.email,
+          subject: 'PIN for TalkTo Login',
+          text: lastLogin.dataValues.pin,
+        });
 
-      if (!lastLogin.dataValues.isPinVerified)
+        console.log('Pinned to email', {
+          to: user.email,
+          subject: 'PIN for TalkTo Login',
+          text: lastLogin.dataValues.pin,
+        });
+
         res.send({
           loginLevel: 2,
           message: 'Please check your email.',
         });
+      }
 
       //   const isMatch = await user.isValidPassword(result.password);
 
