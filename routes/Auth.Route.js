@@ -6,6 +6,7 @@ const { verifyAcessToken } = require('../util/jwt_helper');
 
 router.post('/register', authController.register);
 
+router.post('/check-user', authController.checkUser);
 router.post('/login', authController.login);
 
 router.post('/refresh-token', authController.refreshToken);

@@ -1,8 +1,8 @@
 const createError = require('http-errors');
 const {
-  authSchema,
+  userSchema,
   pinSchema,
-  setPassword,
+  passSchema,
 } = require('../util/validation_schema');
 const User = require('../models/User.Model');
 const Login = require('../models/Login.Model');
@@ -20,7 +20,7 @@ const axios = require('axios');
 module.exports = {
   register: async (req, res, next) => {
     try {
-      const result = await authSchema.validateAsync(req.body);
+      const result = await userSchema.validateAsync(req.body);
 
       const doesExists = await User.findOne({ where: { email: result.email } });
       if (doesExists)
@@ -65,11 +65,14 @@ module.exports = {
       const result = await pinSchema.validateAsync(req.body);
 
       const user = await User.findOne({ where: { email: result.email } });
+      if (!user) throw createError.Unauthorized('User does not exist');
       const record = await Login.findOne({
-        where: { userId: user.id },
+        where: { userId: user.id, isPinVerified: false },
         order: [['createdAt', 'DESC']],
         limit: 1,
       });
+
+      if (!record) throw createError.Unauthorized();
 
       if (record.pin !== +result.pin)
         throw createError.Unauthorized('Pin Does not match');
@@ -82,17 +85,19 @@ module.exports = {
         acessToken,
         refreshToken,
         message: 'Logged In!',
-        loginLevel: 3,
+        loginLevel: 4,
       });
     } catch (error) {
       next(error);
     }
   },
+
   setPassword: async (req, res, next) => {
     try {
-      const result = await setPassword.validateAsync(req.body);
+      const result = await passSchema.validateAsync(req.body);
 
       const user = await User.findOne({ where: { email: result.email } });
+      if (!user) createError.Unauthorized();
       const salt = await bcrypt.genSalt(10);
       const hasedPassword = await bcrypt.hash(result.password, salt);
 
@@ -103,16 +108,20 @@ module.exports = {
       next(error);
     }
   },
+
   login: async (req, res, next) => {
+    // if all ok send login level 3
     try {
-      const result = await authSchema.validateAsync(req.body);
+      const result = await passSchema.validateAsync(req.body);
 
       const user = await User.findOne({ where: { email: result.email } });
 
       if (!user) throw createError.NotFound('User not Registered');
 
-      if (user.password === null)
-        res.send({ loginLevel: 1, msg: 'Set new password' });
+      const isMatch = await user.isValidPassword(result.password);
+
+      if (!isMatch)
+        throw createError.Unauthorized('Wrong Username or password');
 
       const [lastLogin] = await Login.findAll({
         limit: 1,
@@ -123,7 +132,7 @@ module.exports = {
 
       const emailPayload = {
         to: user.email,
-        subject: 'PIN for TalkTo Login',
+        subject: 'TalkTalker Login',
         text: '',
       };
 
@@ -138,22 +147,38 @@ module.exports = {
           isPinVerified: false,
           pin,
         });
-        if (!pinSet) createError.InternalServerError();
+        if (!pinSet) throw createError.InternalServerError();
         emailPayload.text = `Your pin is ${pin}`;
       }
-      await axios.post(process.env.EMAIL_SERVER_URI + '/email', emailPayload);
-      res.send({ loginLevel: 2, message: 'Please check email' });
+      const resEmail = await axios.post(
+        process.env.EMAIL_SERVER_URI + '/email',
+        emailPayload
+      );
+
+      if (resEmail) res.send({ loginLevel: 3, message: resEmail.data.message });
     } catch (error) {
       if (error.isJoi)
-        return next(createError.BadRequest('Invalid Username/Password'));
-      if (axios.isAxiosError) {
         return next(
-          createError.InternalServerError(
-            'Cound not send email. ' + error.response?.data?.message ||
-              error.response
-          )
+          createError.BadRequest(error.details.map((d) => d.message).join('. '))
         );
-      }
+      next(error);
+    }
+  },
+
+  checkUser: async (req, res, next) => {
+    // if all ok send login level 1 or 2 depending on if user email is set to null or not.
+    try {
+      const result = await userSchema.validateAsync(req.body);
+
+      const user = await User.findOne({ where: { email: result.email } });
+
+      if (!user) throw createError.NotFound('User not Registered');
+
+      // User is new and password is not set yet: login level 1
+      if (user.password === null)
+        res.send({ loginLevel: 1, message: 'Set new password' });
+      res.send({ loginLevel: 2, message: 'Enter Password' });
+    } catch (error) {
       next(error);
     }
   },

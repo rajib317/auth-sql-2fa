@@ -1,9 +1,17 @@
+####Check-User Route
+POST http://localhost:3001/auth/check-user
+Content-Type: application/json
+
+{
+    "email":"rajib317@gmail.com"
+}
 ####Login Route
 POST http://localhost:3001/auth/login
 Content-Type: application/json
 
 {
-    "email":"rajib317@gmail.com"
+    "email":"rajib317@gmail.com",
+    "password": "12345608"
 }
 
 ####Register Route
@@ -24,20 +32,20 @@ Content-Type: application/json
 }
 
 ####Verify Pin Route
-POST http://localhost:3000/auth/verify-pin
+POST http://localhost:3001/auth/verify-pin
 Content-Type: application/json
 
 {
-    "email": "idur@yahoo.co.in",
-    "pin": "436315"
+    "email": "rajib317@gmail.com",
+    "pin": "934547"
 }
 ####Set Password
-POST http://localhost:3000/auth/set-password
+POST http://localhost:3001/auth/set-password
 Content-Type: application/json
 
 {
-    "email": "idur@yahoo.co.in",
-    "password": "12345678"
+    "email": "rajib317@gmail.com",
+    "password": "12345608"
 }
 
 ####Testing a protected Route
