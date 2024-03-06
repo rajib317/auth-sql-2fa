@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
     "email": "rajib317@gmail.com",
-    "pin": "934547"
+    "pin": "864721"
 }
 ####Set Password
 POST http://localhost:3001/auth/set-password
@@ -49,5 +49,5 @@ Content-Type: application/json
 }
 
 ####Testing a protected Route
-GET http://localhost:3000/auth/user
+GET http://localhost:3001/auth/user
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MDc5MzI1NTMsImV4cCI6MTcwNzkzMzE1MywiYXVkIjoiMiIsImlzcyI6ImxvY2FsaG9zdCJ9.AtEmMOLVEqQEeUIfhvTktfZ_hcejhUDVtV-xrovJhUU

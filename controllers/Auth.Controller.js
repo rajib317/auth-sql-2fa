@@ -17,6 +17,7 @@ const {
 } = require('../util/jwt_helper');
 const generatePin = require('../util/generate_pin');
 const axios = require('axios');
+const emailer = require('../util/emailer');
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -51,9 +52,9 @@ module.exports = {
 
       res.send({ message: 'User Created.' });
 
-      // const acessToken = await signAccessToken(savedUser.dataValues.id);
+      // const accessToken = await signAccessToken(savedUser.dataValues.id);
       // const refreshToken = await signRefreshToken(savedUser.dataValues.id);
-      // res.send({ acessToken, refreshToken });
+      // res.send({ accessToken, refreshToken });
     } catch (error) {
       if (error.isJoi) error.status = 422;
       next(error);
@@ -79,10 +80,10 @@ module.exports = {
 
       record.update({ isPinVerified: true });
 
-      const acessToken = await signAccessToken(user.id);
+      const accessToken = await signAccessToken(user.id);
       const refreshToken = await signRefreshToken(user.id);
       res.send({
-        acessToken,
+        accessToken,
         refreshToken,
         message: 'Logged In!',
         loginLevel: 4,
@@ -112,6 +113,7 @@ module.exports = {
   login: async (req, res, next) => {
     // if all ok send login level 3
     try {
+      console.log('result.email', req.body);
       const result = await passSchema.validateAsync(req.body);
 
       const user = await User.findOne({ where: { email: result.email } });
@@ -150,16 +152,24 @@ module.exports = {
         if (!pinSet) throw createError.InternalServerError();
         emailPayload.text = `Your pin is ${pin}`;
       }
-      const resEmail = await axios.post(
-        process.env.EMAIL_SERVER_URI + '/email',
-        emailPayload
-      );
 
-      if (resEmail) res.send({ loginLevel: 3, message: resEmail.data.message });
+      const resEmail = await emailer(emailPayload);
+
+      console.log(resEmail);
+
+      if (!resEmail)
+        throw createError.InternalServerError(
+          'Could not send verification email'
+        );
+      res.send({ loginLevel: 3, message: resEmail.message });
     } catch (error) {
       if (error.isJoi)
         return next(
           createError.BadRequest(error.details.map((d) => d.message).join('. '))
+        );
+      if (axios.isAxiosError(error))
+        return next(
+          createError.InternalServerError(error?.response?.data?.message)
         );
       next(error);
     }
